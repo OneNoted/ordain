@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "compiledAt": "2026-09-21T11:32:19Z",
+  "compiledBy": "ordain-curated-presets",
+  "sources": [
+    {
+      "path": "preset:rust@2"
+    }
+  ],
+  "rules": [
+    {
+      "id": "preset-rust-bounded-lifetimes",
+      "text": "Do not introduce repeated or unbounded memory leaks to obtain a static lifetime when the data should be owned, borrowed or shared for a bounded operation. An intentional bounded process-lifetime allocation during initialization is allowed.",
+      "source": {
+        "path": "preset:rust@2"
+      },
+      "scope": [
+        "**/*.rs"
+      ],
+      "when": "edit",
+      "check": {
+        "type": "model",
+        "question": {
+          "type": "boolean",
+          "instructions": "Does added code create a 'static reference by abandoning ownership of a heap allocation on a path that runs for each request or item?",
+          "criteria": {
+            "true": "A per-request, per-item or otherwise unbounded path leaks an owned allocation to produce a 'static reference, with no reclamation contract. Repeated calls retain additional allocations. Box::leak in a request handler is an example, not the only mechanism.",
+            "false": "No such allocation-to-static-reference path is added; the retained allocation occurs only once during process initialization; or ownership is transferred to a component that later frees it. Static types and unsafe code alone do not qualify."
+          }
+        }
+      },
+      "status": "active"
+    },
+    {
+      "id": "preset-rust-borrow-inspection",
+      "text": "Avoid deep cloning or allocating an owned copy solely to inspect unchanged data when an ordinary borrow is sufficient. Owned results are appropriate when independence, mutation, storage or a snapshot is part of the actual contract.",
+      "source": {
+        "path": "preset:rust@2"
+      },
+      "scope": [
+        "**/*.rs"
+      ],
+      "when": "edit",
+      "check": {
+        "type": "model",
+        "question": {
+          "type": "boolean",
+          "instructions": "Does new code unnecessarily copy an unchanged value just to read it? Classify by whether a borrow satisfies the actual consumer contract.",
+          "criteria": {
+            "true": "For example: records.clone().len(); buffer.to_vec().iter().any(predicate); cloning a configuration only to inspect a field. The owned value has the same representation and a borrow would satisfy both the API and lifetime.",
+            "false": "For example: encode text into a byte representation required by a protocol; construct a validated value; clone a result that must outlive its owner; transfer owned data to a worker. These uses require transformation or ownership. No such unnecessary copy is also false."
+          }
+        }
+      },
+      "status": "active"
+    }
+  ]
+}

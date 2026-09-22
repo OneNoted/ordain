@@ -1,0 +1,30 @@
+[tools]
+rust = { version = "1.97.1", profile = "minimal", components = ["rustfmt", "clippy"] }
+
+[tasks.fmt]
+description = "Check Rust formatting"
+run = "cargo fmt --check"
+
+[tasks.clippy]
+description = "Lint every target without changing the lockfile"
+run = "cargo clippy --locked --all-targets -- -D warnings"
+
+[tasks.test]
+description = "Run unit and integration contracts"
+run = "cargo test --locked"
+
+[tasks.build]
+description = "Build the CLI from locked dependencies"
+run = "cargo build --locked"
+
+[tasks.review-contracts]
+description = "Run the corrective review regression contracts"
+run = "cargo test --locked --test review_contracts -- --test-threads=1"
+
+[tasks.test-hermes]
+description = "Test the adapter against an installed Hermes checkout (set HERMES_SOURCE and HERMES_PYTHON)"
+run = '"${HERMES_PYTHON:?set HERMES_PYTHON to the Hermes environment python}" integrations/hermes/test_native.py -v'
+
+[tasks.verify]
+description = "Run all checks without competing Cargo jobs"
+run = "mise run --jobs 1 fmt ::: clippy ::: test ::: build"

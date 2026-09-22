@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "compiledAt": "2026-09-21T11:32:19Z",
+  "compiledBy": "ordain-curated-presets",
+  "sources": [
+    {
+      "path": "preset:core@2"
+    }
+  ],
+  "rules": [
+    {
+      "id": "preset-core-useful-abstractions",
+      "text": "An abstraction must add domain meaning, enforce an invariant, manage a lifecycle, adapt a required interface, or remove meaningful duplication. Do not add a private forwarding wrapper that simply repeats an already clear operation with the same inputs and output.",
+      "source": {
+        "path": "preset:core@2"
+      },
+      "scope": [
+        "**/*.{rs,ts,tsx,mts,cts,js,jsx,py,go}"
+      ],
+      "when": "edit",
+      "check": {
+        "type": "model",
+        "question": {
+          "type": "boolean",
+          "instructions": "Does the change add a redundant private forwarding function?",
+          "criteria": {
+            "true": "An added non-public function only invokes an existing operation with unchanged inputs and result. It adds no domain-specific predicate, enforced condition, lifecycle handling, required interface adaptation, or shared behavior. For example, execute_check(engine, input) only returns engine.check(input).",
+            "false": "No such forwarding function is added; or it defines a domain predicate, enforces a condition, handles a lifecycle, implements a required callback/interface, provides a public facade, or shares additional behavior. Body length and number of callers do not decide this."
+          }
+        }
+      },
+      "status": "active"
+    },
+    {
+      "id": "preset-core-preserve-failures",
+      "text": "Do not convert a failed required operation into an indistinguishable successful empty/default result. Preserve errors or explicitly report incomplete work. Documented best-effort behavior is legitimate when the required result still comes from an authoritative source.",
+      "source": {
+        "path": "preset:core@2"
+      },
+      "scope": [
+        "**/*.{rs,ts,tsx,mts,cts,js,jsx,py,go}"
+      ],
+      "when": "edit",
+      "check": {
+        "type": "model",
+        "question": {
+          "type": "boolean",
+          "instructions": "Does the change swallow an error from required I/O, parsing, configuration or checking and report an ordinary successful result instead? Example violation: collect_changes().unwrap_or_default() followed by a clean review result. Exceptions: a cache read fails and the authoritative store is queried; a missing optional value is treated as absent; partial results explicitly carry failure information. Identify the required operation and the false success, not merely a catch or default expression."
+        }
+      },
+      "status": "active"
+    },
+    {
+      "id": "preset-core-observable-tests",
+      "text": "Tests must protect an observable behavior or important failure path. Do not add a test that merely asserts a literal against itself, duplicates the production computation as its oracle, or inspects incidental private source text without a source-generation or architectural contract.",
+      "source": {
+        "path": "preset:core@2"
+      },
+      "scope": [
+        "**/*.{rs,ts,tsx,mts,cts,js,jsx,py,go}"
+      ],
+      "when": "edit",
+      "check": {
+        "type": "model",
+        "question": {
+          "type": "boolean",
+          "instructions": "Does a new test use a self-confirming oracle or incidental source spelling rather than checking a behavior?",
+          "criteria": {
+            "true": "Examples: assert_eq!(7, 7) without calling the subject; duplicating a pricing algorithm inside the test to compute expected prices; checking that a private local variable has a particular spelling with no source contract.",
+            "false": "Examples: assert_eq!(generator(), \"version=1\") checks generator output, even if the generator currently returns that literal; assert_eq!(price(10), 25) checks specified behavior; comparing emitted source to a fixed snapshot checks a generator contract; testing a documented architecture constraint is valid."
+          }
+        }
+      },
+      "status": "active"
+    },
+    {
+      "id": "preset-core-observable-readiness",
+      "text": "Do not use an arbitrary sleep as proof that asynchronous work is ready. Await the completion signal or observable condition, with a bounded timeout where necessary. Deliberate delays, backoff, real deadline tests and timing behavior under test are legitimate.",
+      "source": {
+        "path": "preset:core@2"
+      },
+      "scope": [
+        "**/*.{rs,ts,tsx,mts,cts,js,jsx,py,go}"
+      ],
+      "when": "edit",
+      "check": {
+        "type": "model",
+        "question": {
+          "type": "boolean",
+          "instructions": "Does added code assume asynchronous work is ready solely because a fixed delay has elapsed?",
+          "criteria": {
+            "true": "Code starts or depends on asynchronous work, sleeps for a guessed duration, then uses its result without observing completion or readiness. For example, start_server(); sleep(100ms); connect() with no readiness check.",
+            "false": "Code observes completion/readiness, including bounded polling; the delay is retry backoff or throttling; elapsed time itself is the behavior being tested; or no delay is used as evidence of readiness."
+          }
+        }
+      },
+      "status": "active"
+    }
+  ]
+}

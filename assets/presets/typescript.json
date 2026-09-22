@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "compiledAt": "2026-09-21T10:41:53Z",
+  "compiledBy": "ordain-curated-presets",
+  "sources": [
+    {
+      "path": "preset:typescript@1"
+    }
+  ],
+  "rules": [
+    {
+      "id": "preset-typescript-validate-boundaries",
+      "text": "A TypeScript assertion does not validate external input. Check externally supplied data before consuming required fields, or rely on an existing validated boundary. Do not replace a missing runtime check with a cast or move that assertion into a variable and call it fixed.",
+      "source": {
+        "path": "preset:typescript@1"
+      },
+      "scope": [
+        "**/*.{ts,tsx,mts,cts}"
+      ],
+      "when": "edit",
+      "check": {
+        "type": "model",
+        "question": {
+          "type": "boolean",
+          "instructions": "Does new code consume unvalidated external JSON, request input or other unknown data as a required typed shape by assertion alone? Example violation: (JSON.parse(body) as Payment).amount.toFixed(2) without validating Payment. Exceptions: a schema parser has validated the value; a type guard checks the required shape; a trusted typed API returns the value; a narrow assertion repairs a known library declaration mismatch with the invariant established. An assertion by itself is not a violation, and merely moving the cast into a variable is not validation."
+        }
+      },
+      "status": "active"
+    },
+    {
+      "id": "preset-typescript-reuse-validation",
+      "text": "Use an existing applicable schema or domain validator instead of duplicating a weaker local approximation of the same contract. A small local guard is legitimate when there is no suitable shared validator, it intentionally answers a narrower question, or reuse would introduce an inappropriate dependency.",
+      "source": {
+        "path": "preset:typescript@1"
+      },
+      "scope": [
+        "**/*.{ts,tsx,mts,cts}"
+      ],
+      "when": "edit",
+      "check": {
+        "type": "model",
+        "question": {
+          "type": "boolean",
+          "instructions": "Does the change duplicate or bypass an available applicable validator for the same domain contract with weaker handwritten checks? Example violation: an existing PaymentSchema checks amount, currency and limits, but a new endpoint only tests typeof amount and casts to Payment. Exceptions: no suitable shared validator is visible; a generic non-null-object guard only supports iteration and claims no domain validity; the shared validator covers a different contract; crossing an architectural boundary to import it would be inappropriate. Require evidence of both the existing validator and the competing validation, not just a function named isRecord."
+        }
+      },
+      "status": "active"
+    }
+  ]
+}

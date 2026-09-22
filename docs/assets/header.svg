@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Ordain</title>
+  <desc id="desc">A review layer for coding agents. Repository rules lead to review and repair.</desc>
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" stroke="#233339" stroke-width="1"/>
+    </pattern>
+    <linearGradient id="fade" x1="0" y1="0" x2="1200" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#111c21"/>
+      <stop offset="0.5" stop-color="#17272c"/>
+      <stop offset="1" stop-color="#111c21"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="360" rx="20" fill="url(#fade)"/>
+  <rect x="1" y="1" width="1198" height="358" rx="19" stroke="#304348"/>
+  <path d="M40 80H260V280H40Z M940 80H1160V280H940Z" fill="url(#grid)" opacity="0.5"/>
+  <g stroke="#4f706d" stroke-width="2" opacity="0.6">
+    <path d="M94 127H187L218 158H263"/>
+    <path d="M94 231H159L190 200H236"/>
+    <path d="M937 158H991L1022 127H1106"/>
+    <path d="M964 200H1010L1041 231H1106"/>
+  </g>
+  <g fill="#9ac8b2">
+    <circle cx="94" cy="127" r="4"/>
+    <circle cx="1106" cy="231" r="4"/>
+  </g>
+  <g fill="#cba581">
+    <circle cx="94" cy="231" r="4"/>
+    <circle cx="1106" cy="127" r="4"/>
+  </g>
+  <g transform="translate(400 94)">
+    <path d="M40 0L76 21V63L40 84L4 63V21L40 0Z" stroke="#a8d5bd" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M23 42L35 54L58 30" stroke="#a8d5bd" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="506" y="174" fill="#f0eee6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="102" font-weight="600" letter-spacing="-5">ordain</text>
+  <text x="600" y="225" text-anchor="middle" fill="#aabdbb" font-family="Inter, Helvetica, Arial, sans-serif" font-size="22" letter-spacing="0.3">A review layer for coding agents.</text>
+  <path d="M404 270H796" stroke="#38504f"/>
+  <g font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="500" letter-spacing="3" text-anchor="middle">
+    <text x="444" y="307" fill="#cba581">RULES</text>
+    <text x="600" y="307" fill="#a8d5bd">REVIEW</text>
+    <text x="756" y="307" fill="#cba581">REPAIR</text>
+  </g>
+  <g stroke="#5d7d77" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M508 302H528M523 297L528 302L523 307"/>
+    <path d="M665 302H685M680 297L685 302L680 307"/>
+  </g>
+</svg>

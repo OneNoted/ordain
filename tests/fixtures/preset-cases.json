@@ -1,0 +1,269 @@
+{
+  "description": "Labelled development controls; not independent accuracy or probability calibration. Includes compliant and legitimate-exception cases for every initial preset rule.",
+  "cases": [
+    {
+      "id": "core-useful-abstractions-bad",
+      "target_rule": "preset-core-useful-abstractions",
+      "expected": "act",
+      "file": "src/case.rs",
+      "before": "struct Engine;\nimpl Engine { fn check(&self, input: &str) -> bool { !input.is_empty() } }\n",
+      "after": "struct Engine;\nimpl Engine { fn check(&self, input: &str) -> bool { !input.is_empty() } }\nfn execute_check(engine: &Engine, input: &str) -> bool { engine.check(input) }\npub fn accepted(input: &str) -> bool { execute_check(&Engine, input) }\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "bad"
+    },
+    {
+      "id": "core-useful-abstractions-good",
+      "target_rule": "preset-core-useful-abstractions",
+      "expected": "clear",
+      "file": "src/case.rs",
+      "before": "struct Engine;\nimpl Engine { fn check(&self, input: &str) -> bool { !input.is_empty() } }\n",
+      "after": "struct Engine;\nimpl Engine { fn check(&self, input: &str) -> bool { !input.is_empty() } }\npub fn accepted(input: &str) -> bool { Engine.check(input) }\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "good"
+    },
+    {
+      "id": "core-useful-abstractions-exception",
+      "target_rule": "preset-core-useful-abstractions",
+      "expected": "clear",
+      "file": "src/case.rs",
+      "before": "struct Engine;\nimpl Engine { fn check(&self, input: &str) -> bool { !input.is_empty() } }\n",
+      "after": "struct Engine;\nimpl Engine { fn check(&self, input: &str) -> bool { !input.is_empty() } }\ntrait Handler { fn on_input(&self, input: &str) -> bool; }\nimpl Handler for Engine { fn on_input(&self, input: &str) -> bool { self.check(input) } }\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "exception"
+    },
+    {
+      "id": "core-preserve-failures-bad",
+      "target_rule": "preset-core-preserve-failures",
+      "expected": "act",
+      "file": "src/case.rs",
+      "before": "use std::{fs, io, path::Path};\n",
+      "after": "use std::{fs, io, path::Path};\npub fn scan(path: &Path) -> io::Result<Vec<String>> {\n let text = fs::read_to_string(path).unwrap_or_default();\n Ok(text.lines().map(str::to_owned).collect())\n}\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "bad"
+    },
+    {
+      "id": "core-preserve-failures-good",
+      "target_rule": "preset-core-preserve-failures",
+      "expected": "clear",
+      "file": "src/case.rs",
+      "before": "use std::{fs, io, path::Path};\n",
+      "after": "use std::{fs, io, path::Path};\npub fn scan(path: &Path) -> io::Result<Vec<String>> {\n let text = fs::read_to_string(path)?;\n Ok(text.lines().map(str::to_owned).collect())\n}\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "good"
+    },
+    {
+      "id": "core-preserve-failures-exception",
+      "target_rule": "preset-core-preserve-failures",
+      "expected": "clear",
+      "file": "src/case.rs",
+      "before": "use std::{fs, io, path::Path};\n",
+      "after": "use std::{fs, io, path::Path};\npub fn load(cache: &Path, authoritative: &Path) -> io::Result<String> {\n match fs::read_to_string(cache) { Ok(text) => Ok(text), Err(_) => fs::read_to_string(authoritative) }\n}\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "exception"
+    },
+    {
+      "id": "core-observable-tests-bad",
+      "target_rule": "preset-core-observable-tests",
+      "expected": "act",
+      "file": "src/case.rs",
+      "before": "pub fn shipping_cost(weight: u32) -> u32 { if weight > 10 { 20 } else { 5 } }\n",
+      "after": "pub fn shipping_cost(weight: u32) -> u32 { if weight > 10 { 20 } else { 5 } }\n#[test] fn verifies_shipping_cost() { assert_eq!(20, 20); }\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "bad"
+    },
+    {
+      "id": "core-observable-tests-good",
+      "target_rule": "preset-core-observable-tests",
+      "expected": "clear",
+      "file": "src/case.rs",
+      "before": "pub fn shipping_cost(weight: u32) -> u32 { if weight > 10 { 20 } else { 5 } }\n",
+      "after": "pub fn shipping_cost(weight: u32) -> u32 { if weight > 10 { 20 } else { 5 } }\n#[test] fn heavy_parcels_cost_more() { assert_eq!(shipping_cost(11), 20); assert_eq!(shipping_cost(10), 5); }\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "good"
+    },
+    {
+      "id": "core-observable-tests-exception",
+      "target_rule": "preset-core-observable-tests",
+      "expected": "clear",
+      "file": "src/case.rs",
+      "before": "pub fn shipping_cost(weight: u32) -> u32 { if weight > 10 { 20 } else { 5 } }\n",
+      "after": "pub fn shipping_cost(weight: u32) -> u32 { if weight > 10 { 20 } else { 5 } }\n// This public generator emits a fixed wire-format version marker consumed externally.\npub fn generate_header() -> String { \"schema_version = 1\\n\".into() }\n#[test] fn wire_header() { assert_eq!(generate_header(), \"schema_version = 1\\n\"); }\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "exception"
+    },
+    {
+      "id": "core-observable-readiness-bad",
+      "target_rule": "preset-core-observable-readiness",
+      "expected": "act",
+      "file": "src/case.ts",
+      "before": "declare function startServer(): void;\ndeclare function waitForReady(): Promise<void>;\ndeclare function connect(): Promise<void>;\n",
+      "after": "declare function startServer(): void;\ndeclare function waitForReady(): Promise<void>;\ndeclare function connect(): Promise<void>;\nexport async function boot() { startServer(); await new Promise(r => setTimeout(r, 200)); await connect(); }\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "bad"
+    },
+    {
+      "id": "core-observable-readiness-good",
+      "target_rule": "preset-core-observable-readiness",
+      "expected": "clear",
+      "file": "src/case.ts",
+      "before": "declare function startServer(): void;\ndeclare function waitForReady(): Promise<void>;\ndeclare function connect(): Promise<void>;\n",
+      "after": "declare function startServer(): void;\ndeclare function waitForReady(): Promise<void>;\ndeclare function connect(): Promise<void>;\nexport async function boot() { startServer(); await waitForReady(); await connect(); }\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "good"
+    },
+    {
+      "id": "core-observable-readiness-exception",
+      "target_rule": "preset-core-observable-readiness",
+      "expected": "clear",
+      "file": "src/case.ts",
+      "before": "declare function startServer(): void;\ndeclare function waitForReady(): Promise<void>;\ndeclare function connect(): Promise<void>;\n",
+      "after": "declare function startServer(): void;\ndeclare function waitForReady(): Promise<void>;\ndeclare function connect(): Promise<void>;\nexport async function retry(operation: () => Promise<void>) { try { await operation(); } catch { await new Promise(r => setTimeout(r, 200)); await operation(); } }\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "exception"
+    },
+    {
+      "id": "rust-bounded-lifetimes-bad",
+      "target_rule": "preset-rust-bounded-lifetimes",
+      "expected": "act",
+      "file": "src/case.rs",
+      "before": "pub struct Router;\nimpl Router { fn route(&self, key: &str) -> bool { key == \"health\" } }\n",
+      "after": "pub struct Router;\nimpl Router { fn route(&self, key: &str) -> bool { key == \"health\" } }\npub fn handle_request(router: &Router, key: String) -> bool { let key: &'static str = Box::leak(key.into_boxed_str()); router.route(key) }\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "bad"
+    },
+    {
+      "id": "rust-bounded-lifetimes-good",
+      "target_rule": "preset-rust-bounded-lifetimes",
+      "expected": "clear",
+      "file": "src/case.rs",
+      "before": "pub struct Router;\nimpl Router { fn route(&self, key: &str) -> bool { key == \"health\" } }\n",
+      "after": "pub struct Router;\nimpl Router { fn route(&self, key: &str) -> bool { key == \"health\" } }\npub fn handle_request(router: &Router, key: String) -> bool { router.route(&key) }\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "good"
+    },
+    {
+      "id": "rust-bounded-lifetimes-exception",
+      "target_rule": "preset-rust-bounded-lifetimes",
+      "expected": "clear",
+      "file": "src/case.rs",
+      "before": "pub struct Router;\nimpl Router { fn route(&self, key: &str) -> bool { key == \"health\" } }\n",
+      "after": "pub struct Router;\nimpl Router { fn route(&self, key: &str) -> bool { key == \"health\" } }\nuse std::sync::OnceLock;\nstatic NAME: OnceLock<&'static str> = OnceLock::new();\n// One bounded immutable allocation retained intentionally for the process lifetime.\npub fn process_name() -> &'static str { NAME.get_or_init(|| Box::leak(String::from(\"worker\").into_boxed_str())) }\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "exception"
+    },
+    {
+      "id": "rust-borrow-inspection-bad",
+      "target_rule": "preset-rust-borrow-inspection",
+      "expected": "act",
+      "file": "src/case.rs",
+      "before": "pub struct Catalog { entries: Vec<String> }\n",
+      "after": "pub struct Catalog { entries: Vec<String> }\nimpl Catalog { pub fn size(&self) -> usize { self.entries.clone().len() } }\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "bad"
+    },
+    {
+      "id": "rust-borrow-inspection-good",
+      "target_rule": "preset-rust-borrow-inspection",
+      "expected": "clear",
+      "file": "src/case.rs",
+      "before": "pub struct Catalog { entries: Vec<String> }\n",
+      "after": "pub struct Catalog { entries: Vec<String> }\nimpl Catalog { pub fn size(&self) -> usize { self.entries.len() } }\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "good"
+    },
+    {
+      "id": "rust-borrow-inspection-exception",
+      "target_rule": "preset-rust-borrow-inspection",
+      "expected": "clear",
+      "file": "src/case.rs",
+      "before": "pub struct Catalog { entries: Vec<String> }\n",
+      "after": "pub struct Catalog { entries: Vec<String> }\nimpl Catalog {\n /// The returned snapshot remains independent after the catalog is edited or dropped.\n pub fn snapshot(&self) -> Vec<String> { self.entries.clone() }\n}\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "exception"
+    },
+    {
+      "id": "typescript-validate-boundaries-bad",
+      "target_rule": "preset-typescript-validate-boundaries",
+      "expected": "act",
+      "file": "src/case.ts",
+      "before": "type Payment = { amount: number };\n",
+      "after": "type Payment = { amount: number };\nexport function formatPayment(body: string): string { return (JSON.parse(body) as Payment).amount.toFixed(2); }\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "bad"
+    },
+    {
+      "id": "typescript-validate-boundaries-good",
+      "target_rule": "preset-typescript-validate-boundaries",
+      "expected": "clear",
+      "file": "src/case.ts",
+      "before": "type Payment = { amount: number };\n",
+      "after": "type Payment = { amount: number };\nexport function formatPayment(body: string): string { const p: unknown = JSON.parse(body); if (typeof p !== \"object\" || p === null || !(\"amount\" in p) || typeof p.amount !== \"number\") throw new Error(\"invalid payment\"); return p.amount.toFixed(2); }\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "good"
+    },
+    {
+      "id": "typescript-validate-boundaries-exception",
+      "target_rule": "preset-typescript-validate-boundaries",
+      "expected": "clear",
+      "file": "src/case.ts",
+      "before": "type Payment = { amount: number };\n",
+      "after": "type Payment = { amount: number };\ndeclare const PaymentSchema: { parse(value: unknown): Payment };\nexport function formatPayment(body: string): string { const payment = PaymentSchema.parse(JSON.parse(body)); return payment.amount.toFixed(2); }\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "exception"
+    },
+    {
+      "id": "typescript-reuse-validation-bad",
+      "target_rule": "preset-typescript-reuse-validation",
+      "expected": "act",
+      "file": "src/case.ts",
+      "before": "type Payment = { amount: number; currency: \"SEK\" | \"EUR\" };\n// Shared validator enforces the full Payment contract, including positive bounded amount.\nfunction parsePayment(input: unknown): Payment {\n if (typeof input !== \"object\" || input === null || !(\"amount\" in input) || typeof input.amount !== \"number\" || !Number.isFinite(input.amount) || input.amount <= 0 || input.amount > 10000 || !(\"currency\" in input) || (input.currency !== \"SEK\" && input.currency !== \"EUR\")) throw new Error(\"invalid payment\");\n return { amount: input.amount, currency: input.currency };\n}\n",
+      "after": "type Payment = { amount: number; currency: \"SEK\" | \"EUR\" };\n// Shared validator enforces the full Payment contract, including positive bounded amount.\nfunction parsePayment(input: unknown): Payment {\n if (typeof input !== \"object\" || input === null || !(\"amount\" in input) || typeof input.amount !== \"number\" || !Number.isFinite(input.amount) || input.amount <= 0 || input.amount > 10000 || !(\"currency\" in input) || (input.currency !== \"SEK\" && input.currency !== \"EUR\")) throw new Error(\"invalid payment\");\n return { amount: input.amount, currency: input.currency };\n}\nexport function endpoint(body: unknown): Payment { if (typeof body === \"object\" && body !== null && \"amount\" in body && typeof body.amount === \"number\") return body as Payment; throw new Error(\"invalid payment\"); }\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "bad"
+    },
+    {
+      "id": "typescript-reuse-validation-good",
+      "target_rule": "preset-typescript-reuse-validation",
+      "expected": "clear",
+      "file": "src/case.ts",
+      "before": "type Payment = { amount: number; currency: \"SEK\" | \"EUR\" };\n// Shared validator enforces the full Payment contract, including positive bounded amount.\nfunction parsePayment(input: unknown): Payment {\n if (typeof input !== \"object\" || input === null || !(\"amount\" in input) || typeof input.amount !== \"number\" || !Number.isFinite(input.amount) || input.amount <= 0 || input.amount > 10000 || !(\"currency\" in input) || (input.currency !== \"SEK\" && input.currency !== \"EUR\")) throw new Error(\"invalid payment\");\n return { amount: input.amount, currency: input.currency };\n}\n",
+      "after": "type Payment = { amount: number; currency: \"SEK\" | \"EUR\" };\n// Shared validator enforces the full Payment contract, including positive bounded amount.\nfunction parsePayment(input: unknown): Payment {\n if (typeof input !== \"object\" || input === null || !(\"amount\" in input) || typeof input.amount !== \"number\" || !Number.isFinite(input.amount) || input.amount <= 0 || input.amount > 10000 || !(\"currency\" in input) || (input.currency !== \"SEK\" && input.currency !== \"EUR\")) throw new Error(\"invalid payment\");\n return { amount: input.amount, currency: input.currency };\n}\nexport function endpoint(body: unknown): Payment { return parsePayment(body); }\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "good"
+    },
+    {
+      "id": "typescript-reuse-validation-exception",
+      "target_rule": "preset-typescript-reuse-validation",
+      "expected": "clear",
+      "file": "src/case.ts",
+      "before": "type Payment = { amount: number; currency: \"SEK\" | \"EUR\" };\n// Shared validator enforces the full Payment contract, including positive bounded amount.\nfunction parsePayment(input: unknown): Payment {\n if (typeof input !== \"object\" || input === null || !(\"amount\" in input) || typeof input.amount !== \"number\" || !Number.isFinite(input.amount) || input.amount <= 0 || input.amount > 10000 || !(\"currency\" in input) || (input.currency !== \"SEK\" && input.currency !== \"EUR\")) throw new Error(\"invalid payment\");\n return { amount: input.amount, currency: input.currency };\n}\n",
+      "after": "type Payment = { amount: number; currency: \"SEK\" | \"EUR\" };\n// Shared validator enforces the full Payment contract, including positive bounded amount.\nfunction parsePayment(input: unknown): Payment {\n if (typeof input !== \"object\" || input === null || !(\"amount\" in input) || typeof input.amount !== \"number\" || !Number.isFinite(input.amount) || input.amount <= 0 || input.amount > 10000 || !(\"currency\" in input) || (input.currency !== \"SEK\" && input.currency !== \"EUR\")) throw new Error(\"invalid payment\");\n return { amount: input.amount, currency: input.currency };\n}\n// This endpoint inspects arbitrary metadata keys, not the Payment contract.\nexport function metadataKeys(input: unknown): string[] { if (typeof input !== \"object\" || input === null || Array.isArray(input)) throw new Error(\"expected metadata object\"); return Object.keys(input); }\n",
+      "phase": "edit",
+      "task": "Implement the requested operation while preserving the documented contract.",
+      "label": "exception"
+    }
+  ]
+}

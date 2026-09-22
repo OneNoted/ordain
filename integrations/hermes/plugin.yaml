@@ -1,0 +1,8 @@
+name: ordain
+version: "0.1.0"
+description: Project-scoped Ordain code review through native Hermes middleware and verification hooks.
+platforms: [linux, macos]
+provides_hooks:
+  - pre_llm_call
+  - pre_verify
+  - on_session_finalize

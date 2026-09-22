@@ -1,0 +1,5 @@
+/target/
+/.ordain/
+/.scratch/
+.env
+.env.local

@@ -1,0 +1,184 @@
+{
+  "description": "Same-author transfer controls, not independent production accuracy. Freeze labels before evaluations; score findings from all applicable rules.",
+  "cases": [
+    {
+      "id": "transfer-forwarder",
+      "target_rule": "preset-core-useful-abstractions",
+      "expected": "act",
+      "file": "src/case.go",
+      "before": "package app\n\ntype Record struct { ID string }\ntype Storage interface { Save(Record) error }\n",
+      "after": "package app\n\ntype Record struct { ID string }\ntype Storage interface { Save(Record) error }\n\nfunc storeRecord(s Storage, r Record) error { return s.Save(r) }\nfunc Handle(s Storage, id string) error { return storeRecord(s, Record{ID: id}) }\n",
+      "phase": "edit",
+      "task": "Persist the record when handling a request.",
+      "label": "Additional authored transfer probe, not independent holdout"
+    },
+    {
+      "id": "transfer-error-context",
+      "target_rule": "preset-core-preserve-failures",
+      "expected": "clear",
+      "file": "src/case.ts",
+      "before": "declare function readConfig(): Promise<string>;\n",
+      "after": "declare function readConfig(): Promise<string>;\n\nexport async function loadSettings() {\n  try { return JSON.parse(await readConfig()); }\n  catch (cause) { throw new Error(\"Cannot load settings\", { cause }); }\n}\n",
+      "phase": "edit",
+      "task": "Load configuration, retaining an actionable error if it fails.",
+      "label": "Additional authored transfer probe, not independent holdout"
+    },
+    {
+      "id": "transfer-mirrored-oracle",
+      "target_rule": "preset-core-observable-tests",
+      "expected": "act",
+      "file": "src/case.rs",
+      "before": "pub fn postage(weight: u32) -> u32 {\n    if weight <= 500 { 30 } else { 30 + (weight - 500).div_ceil(100) * 5 }\n}\n",
+      "after": "pub fn postage(weight: u32) -> u32 {\n    if weight <= 500 { 30 } else { 30 + (weight - 500).div_ceil(100) * 5 }\n}\n\n#[test]\nfn postage_formula() {\n    for weight in [10u32, 500, 501, 899] {\n        let expected = if weight <= 500 { 30 } else { 30 + (weight - 500).div_ceil(100) * 5 };\n        assert_eq!(postage(weight), expected);\n    }\n}\n",
+      "phase": "edit",
+      "task": "Test the postal fee contract.",
+      "label": "Additional authored transfer probe, not independent holdout"
+    },
+    {
+      "id": "transfer-readiness-channel",
+      "target_rule": "preset-core-observable-readiness",
+      "expected": "clear",
+      "file": "src/case.go",
+      "before": "package server\nimport (\"errors\"; \"time\")\n",
+      "after": "package server\nimport (\"errors\"; \"time\")\n\nfunc WaitReady(ready <-chan struct{}) error {\n    select {\n    case <-ready: return nil\n    case <-time.After(2 * time.Second): return errors.New(\"startup timed out\")\n    }\n}\n",
+      "phase": "edit",
+      "task": "Wait for server readiness with a startup timeout.",
+      "label": "Additional authored transfer probe, not independent holdout"
+    },
+    {
+      "id": "transfer-owned-search",
+      "target_rule": "preset-rust-borrow-inspection",
+      "expected": "act",
+      "file": "src/case.rs",
+      "before": "pub struct Directory { names: Vec<String> }\n",
+      "after": "pub struct Directory { names: Vec<String> }\n\nimpl Directory {\n    pub fn contains(&self, needle: &str) -> bool {\n        self.names.to_owned().iter().any(|name| name == needle)\n    }\n}\n",
+      "phase": "edit",
+      "task": "Add a read-only membership query.",
+      "label": "Additional authored transfer probe, not independent holdout"
+    },
+    {
+      "id": "transfer-trusted-assertion",
+      "target_rule": "preset-typescript-validate-boundaries",
+      "expected": "clear",
+      "file": "src/case.ts",
+      "before": "type Axis = \"x\" | \"y\";\n",
+      "after": "type Axis = \"x\" | \"y\";\n\nexport function otherAxis(axis: Axis): Axis {\n    return (axis === \"x\" ? \"y\" : \"x\") as Axis;\n}\n",
+      "phase": "edit",
+      "task": "Return the other axis from an already typed internal input.",
+      "label": "Additional authored transfer probe, not independent holdout"
+    },
+    {
+      "id": "transfer-weaker-guard",
+      "target_rule": "preset-typescript-reuse-validation",
+      "expected": "act",
+      "file": "src/case.ts",
+      "before": "import { z } from \"zod\";\nconst submission = z.object({ email: z.string().email(), age: z.number().int().min(18) });\nexport function parseSubmission(raw: unknown) { return submission.parse(raw); }\n",
+      "after": "import { z } from \"zod\";\nconst submission = z.object({ email: z.string().email(), age: z.number().int().min(18) });\nexport function parseSubmission(raw: unknown) { return submission.parse(raw); }\n\nexport function acceptSubmission(raw: unknown) {\n    if (typeof raw !== \"object\" || raw === null || !(\"email\" in raw) || !(\"age\" in raw) || typeof raw.email !== \"string\" || typeof raw.age !== \"number\") {\n        throw new Error(\"Invalid submission\");\n    }\n    return { email: raw.email, age: raw.age };\n}\n",
+      "phase": "edit",
+      "task": "Accept another submission entrypoint with the same validation contract.",
+      "label": "Additional authored transfer probe, not independent holdout"
+    },
+    {
+      "id": "transfer-static-cstr",
+      "target_rule": "preset-rust-bounded-lifetimes",
+      "expected": "act",
+      "file": "src/case.rs",
+      "before": "use std::ffi::{CString, CStr, NulError};\nfn consume_now(name: &CStr) -> usize { name.to_bytes().len() }\n",
+      "after": "use std::ffi::{CString, CStr, NulError};\nfn consume_now(name: &CStr) -> usize { name.to_bytes().len() }\n\nfn pin_name(name: &str) -> Result<&'static CStr, NulError> {\n    let raw = CString::new(name)?.into_raw();\n    Ok(unsafe { CStr::from_ptr(raw) })\n}\npub fn handle_request(name: &str) -> Result<usize, NulError> {\n    Ok(consume_now(pin_name(name)?))\n}\n",
+      "phase": "edit",
+      "task": "Process repeated incoming names; only this call uses each name.",
+      "label": "Additional authored transfer probe, not independent holdout"
+    },
+    {
+      "id": "transfer-reclaimed-cstr",
+      "target_rule": "preset-rust-bounded-lifetimes",
+      "expected": "clear",
+      "file": "src/case.rs",
+      "before": "use std::ffi::{CString, CStr, NulError};\nfn consume_now(name: &CStr) -> usize { name.to_bytes().len() }\n",
+      "after": "use std::ffi::{CString, CStr, NulError};\nfn consume_now(name: &CStr) -> usize { name.to_bytes().len() }\n\npub fn handle_request(name: &str) -> Result<usize, NulError> {\n    let raw = CString::new(name)?.into_raw();\n    let len = consume_now(unsafe { CStr::from_ptr(raw) });\n    drop(unsafe { CString::from_raw(raw) });\n    Ok(len)\n}\n",
+      "phase": "edit",
+      "task": "Process repeated incoming names; only this call uses each name.",
+      "label": "Additional authored transfer probe, not independent holdout"
+    },
+    {
+      "id": "fresh-copy-sum",
+      "target_rule": "preset-rust-borrow-inspection",
+      "expected": "act",
+      "file": "src/case.rs",
+      "before": "pub struct Batch { numbers: Vec<u64> }\n",
+      "after": "pub struct Batch { numbers: Vec<u64> }\nimpl Batch { pub fn total(&self) -> u64 { self.numbers.clone().iter().sum() } }\n",
+      "phase": "edit",
+      "task": "Return the total without changing stored numbers."
+    },
+    {
+      "id": "fresh-copy-membership",
+      "target_rule": "preset-rust-borrow-inspection",
+      "expected": "act",
+      "file": "src/case.rs",
+      "before": "pub struct Message { text: String }\n",
+      "after": "pub struct Message { text: String }\nimpl Message { pub fn has_marker(&self) -> bool { let local = self.text.to_owned(); local.contains(\"MARK\") } }\n",
+      "phase": "edit",
+      "task": "Check whether the stored message contains MARK."
+    },
+    {
+      "id": "fresh-casefold",
+      "target_rule": "preset-rust-borrow-inspection",
+      "expected": "clear",
+      "file": "src/case.rs",
+      "before": "pub struct Message { text: String }\n",
+      "after": "pub struct Message { text: String }\nimpl Message { pub fn mentions_error(&self) -> bool { self.text.to_lowercase().contains(\"error\") } }\n",
+      "phase": "edit",
+      "task": "Perform a Unicode-lowercased search for error without changing the stored message."
+    },
+    {
+      "id": "fresh-sorted-copy",
+      "target_rule": "preset-rust-borrow-inspection",
+      "expected": "clear",
+      "file": "src/case.rs",
+      "before": "pub struct Batch { numbers: Vec<u64> }\n",
+      "after": "pub struct Batch { numbers: Vec<u64> }\nimpl Batch { pub fn sorted(&self) -> Vec<u64> { let mut result = self.numbers.clone(); result.sort_unstable(); result } }\n",
+      "phase": "edit",
+      "task": "Return an independently owned sorted result and leave the stored sequence unchanged."
+    },
+    {
+      "id": "fresh-self-oracle",
+      "target_rule": "preset-core-observable-tests",
+      "expected": "act",
+      "file": "src/case.rs",
+      "before": "pub fn normalize(raw: &str) -> String { raw.trim().to_lowercase() }\n",
+      "after": "pub fn normalize(raw: &str) -> String { raw.trim().to_lowercase() }\n#[test] fn normalizes() { let actual = normalize(\"  A  \"); let expected = normalize(\"  A  \"); assert_eq!(actual, expected); }\n",
+      "phase": "edit",
+      "task": "Test the normalization contract: trimming whitespace and lowercasing input."
+    },
+    {
+      "id": "fresh-private-spelling",
+      "target_rule": "preset-core-observable-tests",
+      "expected": "act",
+      "file": "src/case.rs",
+      "before": "pub fn remaining(total: u32, used: u32) -> u32 { total.saturating_sub(used) }\n",
+      "after": "pub fn remaining(total: u32, used: u32) -> u32 { total.saturating_sub(used) }\n#[test] fn verifies_remaining() { let source = include_str!(\"case.rs\"); assert!(source.contains(\"total.saturating_sub(used)\")); }\n",
+      "phase": "edit",
+      "task": "Test that remaining never underflows and returns the unused capacity, not how the implementation is spelled."
+    },
+    {
+      "id": "fresh-protocol-constant",
+      "target_rule": "preset-core-observable-tests",
+      "expected": "clear",
+      "file": "src/case.rs",
+      "before": "pub fn greeting() -> &'static [u8] { b\"HELLO/1\\r\\n\" }\n",
+      "after": "pub fn greeting() -> &'static [u8] { b\"HELLO/1\\r\\n\" }\n#[test] fn greeting_matches_protocol() { assert_eq!(greeting(), b\"HELLO/1\\r\\n\"); }\n",
+      "phase": "edit",
+      "task": "Verify the exact bytes of the public wire-protocol greeting."
+    },
+    {
+      "id": "fresh-generated-source",
+      "target_rule": "preset-core-observable-tests",
+      "expected": "clear",
+      "file": "src/case.rs",
+      "before": "pub fn emit(version: u32) -> String { format!(\"pub const VERSION: u32 = {version};\\n\") }\n",
+      "after": "pub fn emit(version: u32) -> String { format!(\"pub const VERSION: u32 = {version};\\n\") }\n#[test] fn generated_version() { assert_eq!(emit(7), \"pub const VERSION: u32 = 7;\\n\"); }\n",
+      "phase": "edit",
+      "task": "Test the generator output format using an independently specified output snapshot."
+    }
+  ]
+}
